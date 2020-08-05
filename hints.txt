@@ -1,0 +1,33 @@
+1. create config.py
+
+2. define model.py
+
+3. define dataset.py and convert given dataset into bert format
+
+4. define engine.py
+
+5. define train.py
+
+6. define app.py ===>>> run it ====>> open link===>>> 127.0.0.1/predict/?sentence=hello world
+
+----------------------------------------------------------------------
+
+		                  ONNX (fast serving)
+
+7. converting in onnx format ==>>> a) change MAX_LEN from 512 to 128 and BATCH_SIZE from 8 to 32 for faster training
+
+
+8. define convert_to_onnx.py  ==>> run this python file via python convert_to_onnx.py =====>>> model.onnx will be generated i.e.model as onnx has been created
+
+
+9. app_onnx.py ==>> same as app.py with minor changes.
+		==>> changes are : i) remove everything that has been cached 
+                                  ii)  remove joblib	
+
+
+		===>> now you can run via 'python app_onnx.py'
+
+
+
+
+10. many other optimization method can be used with pytorch' onnx
