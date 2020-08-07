@@ -82,7 +82,7 @@ def run():
     
     #convert model to multi-gpu model --->> no need to do this if you have not multiple gpus
 	
-    model = nn.DataParallel(model)     
+    model = nn.DataParallel(model)    # use @amp.autocast() in model.py if DataParallel() is enabled
     
     scaler = amp.GradScaler() #from torch.cuda import amp   #this is required if using autoatic mixed precision	 
     #and pass scaler to train_fun
