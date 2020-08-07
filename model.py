@@ -14,7 +14,7 @@ class BERTBaseUncased(nn.Module):
         # 1 becoz binary calssification problem
         self.out = nn.Linear(768, 1)
     
-    @amp.autocast() #use it if model is running on multiple gpu that is nn.dataparallel(model) has been used in train.py
+    @amp.autocast() #use it if model is running on multiple gpu that is nn.dataparallel(model) has been used in train.py and automatic mixed precision is also used
     def forward(self, ids, mask, token_type_ids):
 	#---------------------------------------------------------------------------------------------------------------------
 	#either use decorator or context 'with' scope
