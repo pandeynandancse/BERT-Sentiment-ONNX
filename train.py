@@ -12,6 +12,8 @@ from sklearn import metrics
 from transformers import AdamW
 from transformers import get_linear_schedule_with_warmup
 
+from torch.cuda import amp   #this is required if using autoatic mixed precision
+
 
 def run():
     dfx = pd.read_csv(config.TRAINING_FILE).fillna("none")
@@ -79,11 +81,16 @@ def run():
     )
     
     #convert model to multi-gpu model --->> no need to do this if you have not multiple gpus
-    model = nn.DataParallel(model)
-
+	
+    model = nn.DataParallel(model)     
+    
+    scaler = amp.GradScaler() #from torch.cuda import amp   #this is required if using autoatic mixed precision	 
+    #and pass scaler to train_fun
+	
+	
     best_accuracy = 0
     for epoch in range(config.EPOCHS):
-        engine.train_fn(train_data_loader, model, optimizer, device, scheduler)
+        engine.train_fn(train_data_loader, model, optimizer, device, scheduler, scaler)
         outputs, targets = engine.eval_fn(valid_data_loader, model, device)
         outputs = np.array(outputs) >= 0.5
         accuracy = metrics.accuracy_score(targets, outputs)
