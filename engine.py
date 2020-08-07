@@ -1,13 +1,13 @@
 import torch
 import torch.nn as nn
 from tqdm import tqdm
-
+from torch.cuda import amp  #this is required if using autoatic mixed precision
 
 def loss_fn(outputs, targets):
     return nn.BCEWithLogitsLoss()(outputs, targets.view(-1, 1))
 
 
-def train_fn(data_loader, model, optimizer, device, scheduler):
+def train_fn(data_loader, model, optimizer, device, scheduler, scaler):
     model.train()
 
     for bi, d in tqdm(enumerate(data_loader), total=len(data_loader)):
@@ -24,14 +24,16 @@ def train_fn(data_loader, model, optimizer, device, scheduler):
 
         optimizer.zero_grad()
 
+	with amp.autocast():   #from torch.cuda import amp   #this is required if using autoatic mixed precision
+	
 	#pass through model
-        outputs = model(ids=ids, mask=mask, token_type_ids=token_type_ids)
+            outputs = model(ids=ids, mask=mask, token_type_ids=token_type_ids)	
+            loss = loss_fn(outputs, targets)
 	
-	
-        loss = loss_fn(outputs, targets)
-        loss.backward()
-        optimizer.step()
-        scheduler.step()
+        loss.backward() # replace this line with scaler.scale(loss).backward() ==>> #this is required if using autoatic mixed precision
+        optimizer.step()  # replace this line with scaler.step(optimizer)  ==> #this is required if using autoatic mixed precision   
+	scaler.update()   #this is required if using autoatic mixed precision else not required
+        scheduler.step()    
 
 
 def eval_fn(data_loader, model, device):
